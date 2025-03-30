@@ -62,11 +62,11 @@
 <h3>💻 Local Development</h3>
 
 <h4>🔹 Clone the Repository</h4>
-<pre><code>git clone https://github.com/your-username/social-media-app.git
-cd social-media-app</code></pre>
+<pre><code>git clone https://github.com/AnkitBishen/heygram
+cd heygram</code></pre>
 
 <h4>🔹 Backend Setup (Golang)</h4>
-<pre><code>cd backend
+<pre><code>cd back
 go mod tidy
 go run main.go</code></pre>
 
@@ -108,7 +108,7 @@ npm run dev</code></pre>
 <h2>🌎 Community & Support</h2>
 <ul>
     <li>📢 Discord: <a href="#">Join our community</a></li>
-    <li>📧 Email: your-email@example.com</li>
+    <!-- <li>📧 Email: your-email@example.com</li> -->
 </ul>
 
 <hr>
