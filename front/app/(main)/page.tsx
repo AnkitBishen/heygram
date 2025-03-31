@@ -1,3 +1,6 @@
+"use client"
+
+// import { useRouter } from "next/navigation"
 import Link from "next/link"
 import Image from "next/image"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -7,6 +10,11 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import { Heart, MessageCircle, Bookmark, Send, MoreHorizontal } from "lucide-react"
 
 export default function HomePage() {
+  // const router = useRouter()
+
+  // const navigateToUserProfile = (username: string) => {
+  //   router.push(`/profile/${username}`)
+  // }
   return (
     <div className="flex flex-col md:flex-row">
       <div className="flex-1 space-y-4 p-4 md:max-w-2xl md:mx-auto">

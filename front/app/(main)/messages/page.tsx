@@ -7,7 +7,7 @@ import { Info, Phone, Video, Smile, ImageIcon, Heart, Send } from "lucide-react"
 
 export default function MessagesPage() {
   return (
-    <div className="flex h-[calc(100vh-4rem)] md:h-screen md:pt-16">
+    <div className="flex h-[calc(100vh-4rem)] md:h-screen">
       {/* Conversations List - Hidden on mobile */}
       <div className="hidden md:flex md:w-80 border-r flex-col">
         <div className="p-4 border-b">

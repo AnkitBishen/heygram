@@ -36,6 +36,25 @@ export default function MainLayout({
 
   return (
     <div className="flex min-h-screen bg-background">
+
+      {/* Mobile Header */}
+      {isMobile && (
+        <div className="fixed top-0 left-0 right-0 z-30 border-b bg-background backdrop-blur-lg bg-opacity-80 h-14 flex items-center justify-between px-4">
+          <Link href="/" className="flex items-center">
+            <h1 className="text-xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+              Heygram
+            </h1>
+          </Link>
+          <div className="flex items-center gap-4">
+            <Link href="/notifications" className="flex h-full w-full items-center justify-center">
+              <NotificationIcon filled={pathname === "/notifications"} />
+            </Link>
+
+          </div>
+        </div>
+      )}
+
+
       {/* Desktop Sidebar */}
       {!isMobile && (
         <div className="fixed inset-y-0 z-30 hidden w-20 flex-col border-r bg-background lg:flex lg:w-64">
@@ -89,7 +108,7 @@ export default function MainLayout({
       )}
 
       {/* Main Content */}
-      <main className="flex-1 lg:ml-20 lg:ml-64">{children}</main>
+      <main className="flex-1 lg:ml-64">{children}</main>
 
       {/* Mobile Bottom Navigation */}
       {isMobile && (
@@ -104,9 +123,9 @@ export default function MainLayout({
             <Link href="/create" className="flex h-full w-full items-center justify-center">
               <PlusSquare className={`h-6 w-6 ${pathname === "/create" ? "text-primary" : "text-muted-foreground"}`} />
             </Link>
-            <Link href="/notifications" className="flex h-full w-full items-center justify-center">
-              <Heart
-                className={`h-6 w-6 ${pathname === "/notifications" ? "text-primary" : "text-muted-foreground"}`}
+            <Link href="/messages" className="flex h-full w-full items-center justify-center">
+              <MessageIcon
+                filled={pathname === "/messages"}
               />
             </Link>
             <Link href="/profile" className="flex h-full w-full items-center justify-center">

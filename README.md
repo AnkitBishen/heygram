@@ -10,7 +10,7 @@
     <li>✅ Profile Management</li>
     <li>✅ Post Creation (Images, Videos)</li>
     <li>✅ Like, Comment, and Share Functionality</li>
-    <li>✅ Realtime Chat & Notifications (WebSockets, Redis Pub/Sub)</li>
+    <li>✅ Realtime Chat & Notifications (WebSockets)</li>
     <li>✅ Explore & Search Feature</li>
     <li>✅ Follow & Unfollow System</li>
     <li>✅ Dark Mode Support</li>
@@ -34,16 +34,16 @@
 <ul>
     <li>Golang (High Performance)</li>
     <li>REST API</li>
-    <li>PostgreSQL (Primary Database)</li>
-    <li>Redis (Caching & Pub/Sub)</li>
+    <li>PostgreSQL and MongoDB (Primary Database)</li>
+    <!-- <li>Redis (Caching & Pub/Sub)</li>
     <li>RabbitMQ (Event-Driven Messaging)</li>
-    <li>S3 / Cloudinary (Media Storage)</li>
+    <li>S3 / Cloudinary (Media Storage)</li> -->
 </ul>
 
 <h3>🔹 Infrastructure</h3>
 <ul>
     <li>Docker & Kubernetes (Containerization & Orchestration)</li>
-    <li>Terraform (Infrastructure as Code)</li>
+    <!-- <li>Terraform (Infrastructure as Code)</li> -->
     <li>GitHub Actions (CI/CD Pipeline)</li>
 </ul>
 
@@ -56,13 +56,13 @@
     <li>Node.js 18+</li>
     <li>Go 1.21+</li>
     <li>Docker & Docker Compose</li>
-    <li>PostgreSQL, Redis, and RabbitMQ</li>
+    <li>PostgreSQL, and MongoDb</li>
 </ul>
 
 <h3>💻 Local Development</h3>
 
 <h4>🔹 Clone the Repository</h4>
-<pre><code>git clone https://github.com/AnkitBishen/heygram
+<pre><code>git clone https://github.com/AnkitBishen/heygram.git
 cd heygram</code></pre>
 
 <h4>🔹 Backend Setup (Golang)</h4>
@@ -75,19 +75,16 @@ go run main.go</code></pre>
 npm install
 npm run dev</code></pre>
 
-<h4>🔹 Run with Docker</h4>
-<pre><code>docker-compose up --build</code></pre>
-
 <hr>
 
-<h2>🚀 Deployment</h2>
+<!-- <h2>🚀 Deployment</h2>
 <ul>
     <li>Kubernetes (K8s Manifests available in <code>/deployment/k8s</code>)</li>
     <li>Terraform for Cloud Provisioning</li>
     <li>CI/CD via GitHub Actions</li>
 </ul>
 
-<hr>
+<hr> -->
 
 <h2>🤝 Contributing</h2>
 <p>We welcome contributions! Feel free to:</p>
