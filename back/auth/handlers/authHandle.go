@@ -2,6 +2,7 @@ package authHandle
 
 import (
 	"encoding/json"
+	"net/http"
 	"strings"
 
 	"github.com/AnkitBishen/heygram/auth/helpers/response"
@@ -18,7 +19,7 @@ func Register(pdb storage.Storage) gin.HandlerFunc {
 		var req types.RegisterRequest
 		err := json.NewDecoder(c.Request.Body).Decode(&req)
 		if err != nil {
-			c.JSON(400, response.Err{Success: false, Message: err.Error()})
+			c.JSON(http.StatusBadRequest, response.Err{Success: false, Message: err.Error()})
 			return
 		}
 
@@ -30,7 +31,7 @@ func Register(pdb storage.Storage) gin.HandlerFunc {
 			arrOferr := response.ValidationErr(validationErrors)
 			errs := strings.Join(arrOferr, ", ")
 
-			c.JSON(400, response.Err{Success: false, Message: errs})
+			c.JSON(http.StatusUnprocessableEntity, response.Err{Success: false, Message: errs})
 			return
 		}
 
@@ -46,11 +47,41 @@ func Register(pdb storage.Storage) gin.HandlerFunc {
 		// create user
 		err = pdb.SetUser(req)
 		if err != nil {
-			c.JSON(400, response.Err{Success: false, Message: err.Error()})
+			c.JSON(http.StatusInternalServerError, response.Err{Success: false, Message: err.Error()})
 			return
 		}
 
-		c.JSON(200, response.Ok{Success: true, Message: "user created"})
+		c.JSON(http.StatusAccepted, response.Ok{Success: true, Message: "user created"})
+
+	}
+}
+
+func Login(pdb storage.Storage) gin.HandlerFunc {
+	return func(c *gin.Context) {
+
+		// get request body
+		var req types.RegisterRequest
+		err := json.NewDecoder(c.Request.Body).Decode(&req)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, response.Err{Success: false, Message: err.Error()})
+			return
+		}
+
+		// validate request
+		validator_new := validator.New()
+		verr := validator_new.Struct(req)
+		if verr != nil {
+			validationErrors := verr.(validator.ValidationErrors)
+			arrOferr := response.ValidationErr(validationErrors)
+			errs := strings.Join(arrOferr, ", ")
+
+			c.JSON(http.StatusUnprocessableEntity, response.Err{Success: false, Message: errs})
+			return
+		}
+
+		// validate password
+
+		c.JSON(http.StatusAccepted, response.Ok{Success: true, Message: "token"})
 
 	}
 }

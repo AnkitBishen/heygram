@@ -23,7 +23,20 @@ func New(url string) (*Psql, error) {
 	return &Psql{DB: db}, nil
 }
 
-// IsUserExists implements storage.Storage.
+// create initial table
+func (p *Psql) InitialTbls() error {
+
+	// users table
+	_, err := p.DB.Exec("CREATE TABLE IF NOT EXISTS users (id serial PRIMARY KEY, name text, dob text, username text, email text, password text)")
+	if err != nil {
+		slog.Error("failed to create users table", slog.String("error", err.Error()))
+		return err
+	}
+
+	return nil
+}
+
+// check is User Exists
 func (p *Psql) IsUserExists(userName string, email string) (bool, types.RegisterRequest) {
 
 	row := p.DB.QueryRow("SELECT * FROM users WHERE username = $1 AND email = $2", userName, email)
@@ -41,7 +54,7 @@ func (p *Psql) IsUserExists(userName string, email string) (bool, types.Register
 	return true, user
 }
 
-// SetUser implements storage.Storage.
+// insert user
 func (p *Psql) SetUser(user types.RegisterRequest) error {
 
 	_, err := p.DB.Exec("INSERT INTO users (name, dob, username, email, password) VALUES ($1, $2, $3, $4, $5)", user.Name, user.Dob, user.Username, user.Email, user.Password)

@@ -41,10 +41,18 @@ func main() {
 		return
 	}
 
+	// create initial tables if they don't exist
+	err = pdb.InitialTbls()
+	if err != nil {
+		slog.Error("failed to create initial tables", slog.String("error", err.Error()))
+		return
+	}
+
 	// start server here
 	ar := gin.Default()
 
 	ar.POST("/auth/v1/register", authHandle.Register(pdb))
+	ar.POST("/auth/v1/login", authHandle.Login(pdb))
 
 	if err := ar.Run(":8000"); err != nil {
 		slog.Error("failed to run server", slog.String("error", err.Error()))
