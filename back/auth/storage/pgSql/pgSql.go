@@ -37,18 +37,18 @@ func (p *Psql) InitialTbls() error {
 }
 
 // check is User Exists
-func (p *Psql) IsUserExists(userName string, email string) (bool, types.RegisterRequest) {
+func (p *Psql) IsUserExists(email string) (bool, types.User) {
 
-	row := p.DB.QueryRow("SELECT * FROM users WHERE username = $1 AND email = $2", userName, email)
+	row := p.DB.QueryRow("SELECT * FROM users WHERE email = $1", email)
 
-	var user types.RegisterRequest
-	err := row.Scan(&user.Name, &user.Dob, &user.Username, &user.Email, &user.Password)
+	var user types.User
+	err := row.Scan(&user.Id, &user.Name, &user.Dob, &user.Username, &user.Email, &user.Password)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return false, types.RegisterRequest{}
+			return false, types.User{}
 		}
 		slog.Error("failed to scan row", slog.String("error", err.Error()))
-		return false, types.RegisterRequest{}
+		return false, types.User{}
 	}
 
 	return true, user

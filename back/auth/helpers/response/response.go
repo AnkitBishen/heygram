@@ -8,7 +8,6 @@ import (
 
 type Ok struct {
 	Success bool   `json:"success"`
-	Data    string `json:"data"`
 	Message string `json:"message"`
 }
 
@@ -25,6 +24,10 @@ func ValidationErr(errs validator.ValidationErrors) []string {
 		switch err.ActualTag() {
 		case "required":
 			erMsg = append(erMsg, fmt.Sprintf("field %s is required", err.Field()))
+		case "min":
+			erMsg = append(erMsg, fmt.Sprintf("%s must be at least 8 characters", err.Field()))
+		case "containsany":
+			erMsg = append(erMsg, fmt.Sprintf("%s must contain at least one special character", err.Field()))
 		default:
 			erMsg = append(erMsg, fmt.Sprintf("field %s is invalid", err.Field()))
 		}

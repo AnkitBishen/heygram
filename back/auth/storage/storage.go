@@ -7,5 +7,5 @@ import (
 type Storage interface {
 	InitialTbls() error
 	SetUser(user types.RegisterRequest) error
-	IsUserExists(userName string, email string) (bool, types.RegisterRequest)
+	IsUserExists(email string) (bool, types.User)
 }
