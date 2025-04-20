@@ -15,6 +15,11 @@ type Err struct {
 	Success bool   `json:"success"`
 	Message string `json:"message"`
 }
+type OkWithData struct {
+	Success bool        `json:"success"`
+	Data    interface{} `json:"data"`
+	Message string      `json:"message"`
+}
 
 func ValidationErr(errs validator.ValidationErrors) []string {
 

@@ -16,7 +16,7 @@ func ValidateJWT(tokenString string) (*jwt.Token, error) {
 	return token, nil
 }
 
-func AuthMiddleware(next http.Handler) http.Handler {
+func AuthMiddleware1(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
 		// JWT Cookie read karo

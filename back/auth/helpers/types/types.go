@@ -21,3 +21,12 @@ type LoginRequest struct {
 	Username string `json:"username" validate:"required"`
 	Password string `json:"password" validate:"required"`
 }
+type ProfileRequest struct {
+	Username string `json:"username" validate:"required"`
+}
+
+type LoginSessionReq struct {
+	UserId    int    `json:"userId"`
+	SessionId string `json:"sessionid"`
+	// Expire
+}

@@ -24,6 +24,7 @@ func RandStringBytes(n int) string {
 	return string(b)
 }
 
+// Register is a handler function for create new users.
 func Register(pdb storage.Storage) gin.HandlerFunc {
 	return func(c *gin.Context) {
 
@@ -51,9 +52,9 @@ func Register(pdb storage.Storage) gin.HandlerFunc {
 		// hash password
 
 		// check if user already exists
-		ok, _ := pdb.IsUserExists(req.Email)
+		ok, _ := pdb.IsUserExists(req.Email, req.Username)
 		if ok {
-			c.JSON(400, response.Err{Success: false, Message: "user already exists"})
+			c.JSON(http.StatusConflict, response.Err{Success: false, Message: "user already exists"})
 			return
 		}
 
@@ -69,6 +70,7 @@ func Register(pdb storage.Storage) gin.HandlerFunc {
 	}
 }
 
+// Login is a handler function for validate credentials and login in software
 func Login(pdb storage.Storage) gin.HandlerFunc {
 	return func(c *gin.Context) {
 
@@ -94,7 +96,7 @@ func Login(pdb storage.Storage) gin.HandlerFunc {
 		}
 
 		// validate credentials
-		ok, user := pdb.IsUserExists(req.Username)
+		ok, user := pdb.IsUserExists("", req.Username)
 		if !ok {
 			c.JSON(http.StatusUnauthorized, response.Err{Success: false, Message: "Account not found"})
 			return
@@ -114,7 +116,55 @@ func Login(pdb storage.Storage) gin.HandlerFunc {
 		http.SetCookie(c.Writer, &http.Cookie{Name: "token", Value: token, HttpOnly: true})
 		http.SetCookie(c.Writer, &http.Cookie{Name: "session_id", Value: sessionId, HttpOnly: true})
 
+		// store login session
+		var sessionParams = types.LoginSessionReq{
+			UserId:    user.Id,
+			SessionId: sessionId,
+		}
+		err = pdb.StoreLoginSession(sessionParams)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, response.Err{Success: false, Message: "Something went wrong."})
+			return
+		}
+
 		c.JSON(http.StatusAccepted, gin.H{"success": true, "message": "Login successful", "token": token})
+
+	}
+}
+
+// Profile is a handler function for which return the depth details of particular user.
+func Profile(pdb storage.Storage) gin.HandlerFunc {
+	return func(c *gin.Context) {
+
+		// get request body
+		var req types.ProfileRequest
+		err := json.NewDecoder(c.Request.Body).Decode(&req)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, response.Err{Success: false, Message: err.Error()})
+			return
+		}
+		defer c.Request.Body.Close()
+
+		// validate request
+		validator_new := validator.New()
+		verr := validator_new.Struct(req)
+		if verr != nil {
+			validationErrors := verr.(validator.ValidationErrors)
+			arrOferr := response.ValidationErr(validationErrors)
+			errs := strings.Join(arrOferr, ", ")
+
+			c.JSON(http.StatusUnprocessableEntity, response.Err{Success: false, Message: errs})
+			return
+		}
+
+		// validate credentials
+		user, err := pdb.GetUser(req.Username)
+		if err != nil {
+			c.JSON(http.StatusUnauthorized, response.Err{Success: false, Message: "Account not found"})
+			return
+		}
+
+		c.JSON(http.StatusAccepted, response.OkWithData{Success: false, Data: user, Message: ""})
 
 	}
 }
