@@ -25,3 +25,7 @@ front/.vercel
 # typescript
 front/*.tsbuildinfo
 front/next-env.d.ts
+
+
+back/data
+.qodo
