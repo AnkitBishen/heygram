@@ -18,9 +18,17 @@ type RegisterRequest struct {
 }
 
 type LoginRequest struct {
-	Username string `json:"username" validate:"required"`
-	Password string `json:"password" validate:"required"`
+	Username   string `json:"username" validate:"required"`
+	Password   string `json:"password" validate:"required"`
+	Browser    string `json:"browser"`
+	Device     string `json:"device"`
+	DeviceName string `json:"deviceName"`
 }
+
+type LogoutRequest struct {
+	Username string `json:"username" validate:"required"`
+}
+
 type ProfileRequest struct {
 	Username string `json:"username" validate:"required"`
 }
@@ -29,4 +37,7 @@ type LoginSessionReq struct {
 	UserId    int    `json:"userId"`
 	SessionId string `json:"sessionid"`
 	// Expire
+	Browser    string `json:"browser"`
+	Device     string `json:"device"`
+	DeviceName string `json:"deviceName"`
 }

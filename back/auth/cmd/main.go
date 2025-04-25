@@ -12,6 +12,7 @@ import (
 	"time"
 
 	authHandle "github.com/AnkitBishen/heygram/auth/handlers"
+	"github.com/AnkitBishen/heygram/auth/helpers/cors"
 	"github.com/AnkitBishen/heygram/auth/storage/pgSql"
 	"github.com/AnkitBishen/heygram/common/shared"
 	"github.com/gin-gonic/gin"
@@ -69,12 +70,12 @@ func main() {
 	// start server here
 	ar := gin.Default()
 
-	// ar.Use(shared.AuthMiddleware())
+	ar.Use(cors.CORSMiddleware())
 
 	// routes
 	ar.POST("/auth/v1/register", authHandle.Register(pdb))
 	ar.POST("/auth/v1/login", authHandle.Login(pdb))
-	// ar.POST("/auth/v1/logout", shared.AuthMiddleware(), authHandle.Logout(pdb))
+	ar.POST("/auth/v1/logout", shared.AuthMiddleware(), authHandle.Logout(pdb))
 	ar.POST("/auth/v1/profile", shared.AuthMiddleware(), authHandle.Profile(pdb))
 
 	srv := &http.Server{

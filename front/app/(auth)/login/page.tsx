@@ -1,7 +1,6 @@
 "use client"
 
 import type React from "react"
-
 import { useState } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
@@ -10,12 +9,115 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
 import { Instagram } from "lucide-react"
-import { useAuth } from "@/contexts/auth-context"
+import {UAParser} from 'ua-parser-js';
+
+/**
+ * Utility to detect simple browser name & device
+ */
+function getBrowserAndDevice() {
+  const ua = typeof window !== "undefined" ? window.navigator.userAgent : ""
+  let browser = "Unknown Browser"
+  let device = "Unknown Device"
+  let deviceName = "Unknown Device Name"
+
+  // const parser = new UAParser();
+  // const result = parser.getResult();
+  // console.log(result.browser.name); // Chrome, Firefox, etc.
+  // console.log(result.device.type);  // mobile, tablet, etc.
+  // console.log(result.os.name);      // Windows, Android, iOS, etc.
+
+
+  // browser = result.browser.name ? result.browser.name : browser;
+  // if(result.os.name == 'Windows'){
+  //   device = "Desktop";
+  // }else{
+  //   device = result.os.name ? result.os.name : device;
+  // }
+
+  // deviceName = result.device.model ? result.device.model : deviceName;
+
+
+
+  // Simple browser detection (not exhaustive)
+  if (ua.includes("Chrome") && !ua.includes("Edg")) browser = "Chrome"
+  else if (ua.includes("Firefox")) browser = "Firefox"
+  else if (ua.includes("Safari") && !ua.includes("Chrome")) browser = "Safari"
+  else if (ua.includes("Edg")) browser = "Edge"
+  else if (ua.includes("OPR") || ua.includes("Opera")) browser = "Opera"
+
+  // Device detection 
+  if (
+    /Mobi|Android|iPhone|BlackBerry|IEMobile|Opera Mini/i.test(ua)
+  ) {
+    device = "Mobile"
+  } else if (
+    /Tablet|iPad|Nexus 7|Nexus 10|KFAPWI/i.test(ua)
+  ) {
+    device = "Tablet"
+  } else {
+    device = "Desktop"
+  }
+
+  // Device name detection 
+  if (/iPhone/.test(ua)) {
+    deviceName = 'iPhone'
+  } else if (/iPad/.test(ua)) {
+    deviceName = 'iPad'
+  } else if (/Android/.test(ua)) {
+    if (/Mobile/.test(ua)) {
+      deviceName = 'Android Phone'
+    } else {
+      deviceName = 'Android Tablet'
+    }
+  } else if (/Windows/.test(ua)) {
+    deviceName = 'Windows PC'
+  } else if (/Macintosh/.test(ua)) {
+    deviceName = 'Mac'
+  }
+  return { browser, device, deviceName }
+}
 
 export default function LoginPage() {
   const [email, setEmail] = useState<string>("")
   const [password, setPassword] = useState<string>("")
-  const { login, loading, error } = useAuth()
+  const [loading, setLoading] = useState<boolean>(false)
+  const [error, setError] = useState<string | null>(null)
+  const router = useRouter()
+
+  const login = async (username: string, password: string) => {
+    setLoading(true)
+    setError(null)
+    const { browser, device, deviceName } = getBrowserAndDevice()
+    try {
+      const res = await fetch("http://192.168.176.217:8000/auth/v1/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          username: username,
+          password: password,
+          browser: browser,
+          device: device,
+          deviceName: deviceName,
+        }),
+      })
+      // console.log(res)
+      if (!res.ok) {
+        // Handle errors based on API response
+        const errMsg = (await res.json())?.message ?? "Login failed"
+        throw new Error(errMsg)
+      }
+      const data = await res.json()
+      // Handle login success (e.g., saving token, redirect)
+      // For demonstration: redirect to home
+      router.push("/")
+    } catch (err: any) {
+      setError(err.message || "Failed to login.")
+    } finally {
+      setLoading(false)
+    }
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -63,6 +165,9 @@ export default function LoginPage() {
                 onChange={(e) => setPassword(e.target.value)}
               />
             </div>
+            {error && (
+              <div className="text-red-500 text-sm text-center">{error}</div>
+            )}
             <Button className="w-full" type="submit" disabled={loading}>
               {loading ? "Signing in..." : "Sign In"}
             </Button>
@@ -94,4 +199,3 @@ export default function LoginPage() {
     </div>
   )
 }
-

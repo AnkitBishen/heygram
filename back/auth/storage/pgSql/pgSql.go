@@ -34,7 +34,7 @@ func (p *Psql) InitialTbls() error {
 	}
 
 	// login session table
-	_, err = p.DB.Exec("CREATE TABLE IF NOT EXISTS loginSession (id serial PRIMARY KEY, userId text, session_id text)")
+	_, err = p.DB.Exec("CREATE TABLE IF NOT EXISTS loginSession (id serial PRIMARY KEY, userId text, session_id text, browser text, device text, deviceName text)")
 	if err != nil {
 		slog.Error("failed to create loginSession table", slog.String("error", err.Error()))
 		return err
@@ -92,7 +92,7 @@ func (p *Psql) GetUser(userName string) (types.User, error) {
 
 // StoreLoginSession
 func (p *Psql) StoreLoginSession(session types.LoginSessionReq) error {
-	_, err := p.DB.Exec("INSERT INTO loginSession (userId, session_id) VALUES ($1, $2)", session.UserId, session.SessionId)
+	_, err := p.DB.Exec("INSERT INTO loginSession (userId, session_id, browser, device, deviceName) VALUES ($1, $2, $3, $4, $5)", session.UserId, session.SessionId, session.Browser, session.Device, session.DeviceName)
 	if err != nil {
 		return err
 	}

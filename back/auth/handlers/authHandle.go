@@ -5,6 +5,7 @@ import (
 	"math/rand"
 	"net/http"
 	"strings"
+	"time"
 
 	jwtauth "github.com/AnkitBishen/heygram/auth/helpers/jwtAuth"
 	"github.com/AnkitBishen/heygram/auth/helpers/response"
@@ -104,7 +105,7 @@ func Login(pdb storage.Storage) gin.HandlerFunc {
 
 		// check password with hash
 		if user.Password != req.Password {
-			c.JSON(http.StatusUnauthorized, response.Err{Success: false, Message: "Invalid credentials"})
+			c.JSON(http.StatusUnauthorized, response.Err{Success: false, Message: "Invalid Password"})
 			return
 		}
 
@@ -118,12 +119,15 @@ func Login(pdb storage.Storage) gin.HandlerFunc {
 
 		// store login session
 		var sessionParams = types.LoginSessionReq{
-			UserId:    user.Id,
-			SessionId: sessionId,
+			UserId:     user.Id,
+			SessionId:  sessionId,
+			Browser:    req.Browser,
+			Device:     req.Device,
+			DeviceName: req.DeviceName,
 		}
 		err = pdb.StoreLoginSession(sessionParams)
 		if err != nil {
-			c.JSON(http.StatusBadRequest, response.Err{Success: false, Message: "Something went wrong."})
+			c.JSON(http.StatusBadRequest, response.Err{Success: false, Message: err.Error()})
 			return
 		}
 
@@ -165,6 +169,42 @@ func Profile(pdb storage.Storage) gin.HandlerFunc {
 		}
 
 		c.JSON(http.StatusAccepted, response.OkWithData{Success: false, Data: user, Message: ""})
+
+	}
+}
+
+// Logout is a handler function for destory all access
+func Logout(pdb storage.Storage) gin.HandlerFunc {
+	return func(c *gin.Context) {
+
+		// get request body
+		var req types.LogoutRequest
+		err := json.NewDecoder(c.Request.Body).Decode(&req)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, response.Err{Success: false, Message: err.Error()})
+			return
+		}
+		defer c.Request.Body.Close()
+
+		// validate request
+		validator_new := validator.New()
+		verr := validator_new.Struct(req)
+		if verr != nil {
+			validationErrors := verr.(validator.ValidationErrors)
+			arrOferr := response.ValidationErr(validationErrors)
+			errs := strings.Join(arrOferr, ", ")
+
+			c.JSON(http.StatusUnprocessableEntity, response.Err{Success: false, Message: errs})
+			return
+		}
+
+		// delete cookies
+		http.SetCookie(c.Writer, &http.Cookie{Name: "token", Value: "", HttpOnly: true, Expires: time.Unix(0, 0)})
+		http.SetCookie(c.Writer, &http.Cookie{Name: "session_id", Value: "", HttpOnly: true, Expires: time.Unix(0, 0)})
+
+		// logout form current borwser or device
+
+		c.JSON(http.StatusAccepted, response.OkWithData{Success: false, Data: "", Message: ""})
 
 	}
 }

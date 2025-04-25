@@ -19,7 +19,7 @@ export default function RegisterPage() {
     e.preventDefault()
     setIsLoading(true)
     // Simulate registration
-    await new Promise((resolve) => {
+    const registerRes = await new Promise((resolve) => {
       	// call api
 		fetch("http://localhost:8000/auth/v1/register", {
 			method: "POST",
@@ -34,18 +34,20 @@ export default function RegisterPage() {
 				password: (e.target as any).password.value,
 			}), 
 		}). then((res) => {
+			console.log(res)
 			if (res.ok) {
-				resolve(res)
+				resolve(true)
 			}
 		}).catch((err) => {
-			console.log(err)
+			resolve(false)
 		})
     })
 
-    setTimeout(() => {
-      setIsLoading(false)
-      router.push("/")
-    }, 1000)
+	if(registerRes){
+		router.push("/login")
+	}else{
+		setIsLoading(false)
+	}
   }
 
   return (
