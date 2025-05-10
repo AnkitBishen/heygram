@@ -79,7 +79,7 @@ func main() {
 	ar.POST("/auth/v1/profile", shared.AuthMiddleware(), authHandle.Profile(pdb))
 
 	srv := &http.Server{
-		Addr:    ":8000",
+		Addr:    ":8001",
 		Handler: ar,
 	}
 

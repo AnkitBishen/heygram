@@ -2,11 +2,13 @@ package authHandle
 
 import (
 	"encoding/json"
+	"fmt"
 	"math/rand"
 	"net/http"
 	"strings"
 	"time"
 
+	"github.com/AnkitBishen/heygram/auth/helpers/argon2hash"
 	jwtauth "github.com/AnkitBishen/heygram/auth/helpers/jwtAuth"
 	"github.com/AnkitBishen/heygram/auth/helpers/response"
 	"github.com/AnkitBishen/heygram/auth/helpers/types"
@@ -16,6 +18,14 @@ import (
 )
 
 const letterBytes = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890"
+
+const (
+	arg2time = uint32(1)
+	memory   = uint32(64 * 1024)
+	threads  = uint8(4)
+	keyLen   = uint32(32)
+	salt     = "F62c3CgjsZJ6p0fowmHM0g"
+)
 
 func RandStringBytes(n int) string {
 	b := make([]byte, n)
@@ -51,6 +61,11 @@ func Register(pdb storage.Storage) gin.HandlerFunc {
 		}
 
 		// hash password
+		req.Password, err = argon2hash.HashPassword(req.Password, salt, arg2time, memory, threads, keyLen)
+		if err != nil {
+			fmt.Println("Error hashing password:", err)
+			return
+		}
 
 		// check if user already exists
 		ok, _ := pdb.IsUserExists(req.Email, req.Username)
@@ -104,7 +119,9 @@ func Login(pdb storage.Storage) gin.HandlerFunc {
 		}
 
 		// check password with hash
-		if user.Password != req.Password {
+		// logs.WriteLogs("salt value: " + salt)
+		valid, _ := argon2hash.VerifyPassword(req.Password, user.Password, salt, arg2time, memory, threads, keyLen)
+		if !valid {
 			c.JSON(http.StatusUnauthorized, response.Err{Success: false, Message: "Invalid Password"})
 			return
 		}

@@ -1,39 +1,38 @@
-# Use postgres/example user/password credentials
 
 services:
-
   pgDb:
     image: postgres
     restart: always
     shm_size: 128mb
     volumes:
-     - ./data:/var/lib/postgresql/data
+      - ./data:/var/lib/postgresql/data
     ports:
       - 5432:5432
     environment:
       POSTGRES_DB: exampleDb
       POSTGRES_USER: exampleU
       POSTGRES_PASSWORD: exampleP
-    
-  # mongoDb:
-  #   image: mongo
-  #   restart: always
-  #   environment:
-  #     MONGO_INITDB_ROOT_USERNAME: root
-  #     MONGO_INITDB_ROOT_PASSWORD: example
 
-  # mongo-express is a web interface for MongoDB
-  # mongo-express:
-  #   image: mongo-express
-  #   restart: always
-  #   ports:
-  #     - 8081:8081
-  #   environment:
-  #     ME_CONFIG_MONGODB_ADMINUSERNAME: root
-  #     ME_CONFIG_MONGODB_ADMINPASSWORD: example
-  #     ME_CONFIG_MONGODB_URL: mongodb://root:example@mongo:27017/
-  #     ME_CONFIG_BASICAUTH: false
+#   auth:
+#     build:
+#       context: ./auth
+#     container_name: c_auth
+#     ports: 
+#       - 8001:8001
+#     networks:
+#       - ntw_hg01
 
+#   common:
+#     build:
+#       context: ./common
+#     container_name: c_common
+#     networks:
+#       - ntw_hg01
+
+# networks:
+#   ntw_hg01:
+#     driver: bridge
+  
   # adminer is a web interface for PostgreSQL and other sql databases
   # adminer:
   #   image: adminer

@@ -28,4 +28,5 @@ front/next-env.d.ts
 
 
 back/data
+back/auth/app.log
 .qodo
