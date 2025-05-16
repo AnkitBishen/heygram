@@ -34,10 +34,15 @@ type ProfileRequest struct {
 }
 
 type LoginSessionReq struct {
-	UserId    int    `json:"userId"`
-	SessionId string `json:"sessionid"`
-	// Expire
+	UserId     int    `json:"userId"`
+	SessionId  string `json:"sessionid"`
 	Browser    string `json:"browser"`
 	Device     string `json:"device"`
 	DeviceName string `json:"deviceName"`
+}
+
+type ForgetPasswordReq struct {
+	UserId     string `json:"userid" validate:"required"`     // userid means email, username or phone
+	ActionFrom int16  `json:"actionFrom" validate:"required"` // 1:- forget password, 2:- reset password
+	NewPass    string `json:"newpass"`
 }

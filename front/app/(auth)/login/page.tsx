@@ -84,12 +84,15 @@ export default function LoginPage() {
   const [error, setError] = useState<string | null>(null)
   const router = useRouter()
 
+  /**
+   * Login function - sends credentials and device info, stores token on success
+   */
   const login = async (username: string, password: string) => {
     setLoading(true)
     setError(null)
     const { browser, device, deviceName } = getBrowserAndDevice()
     try {
-      const res = await fetch("http://192.168.176.217:8000/auth/v1/login", {
+      const res = await fetch("http://localhost:8001/auth/v1/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -102,15 +105,17 @@ export default function LoginPage() {
           deviceName: deviceName,
         }),
       })
-      // console.log(res)
       if (!res.ok) {
-        // Handle errors based on API response
         const errMsg = (await res.json())?.message ?? "Login failed"
         throw new Error(errMsg)
       }
       const data = await res.json()
-      // Handle login success (e.g., saving token, redirect)
-      // For demonstration: redirect to home
+      // Store token for future authenticated requests, if exists
+      if (data.token) {
+        localStorage.setItem("authToken", data.token)
+        // Optionally, set up global auth context or cookies as needed
+      }
+      // Redirect to homepage or intended page
       router.push("/")
     } catch (err: any) {
       setError(err.message || "Failed to login.")

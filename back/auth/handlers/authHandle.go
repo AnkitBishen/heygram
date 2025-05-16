@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/AnkitBishen/heygram/auth/helpers/argon2hash"
+	"github.com/AnkitBishen/heygram/auth/helpers/configmail"
 	jwtauth "github.com/AnkitBishen/heygram/auth/helpers/jwtAuth"
 	"github.com/AnkitBishen/heygram/auth/helpers/response"
 	"github.com/AnkitBishen/heygram/auth/helpers/types"
@@ -60,7 +61,7 @@ func Register(pdb storage.Storage) gin.HandlerFunc {
 			return
 		}
 
-		// hash password
+		// hash password by using argon2 method
 		req.Password, err = argon2hash.HashPassword(req.Password, salt, arg2time, memory, threads, keyLen)
 		if err != nil {
 			fmt.Println("Error hashing password:", err)
@@ -221,7 +222,99 @@ func Logout(pdb storage.Storage) gin.HandlerFunc {
 
 		// logout form current borwser or device
 
-		c.JSON(http.StatusAccepted, response.OkWithData{Success: false, Data: "", Message: ""})
+		c.JSON(http.StatusAccepted, response.Ok{Success: true, Message: "Successfully logout"})
 
+	}
+}
+
+// ForgetPassword is a handler function for change the password
+func ForgetPassword(pdb storage.Storage) gin.HandlerFunc {
+	return func(c *gin.Context) {
+
+		// get request body
+		var req types.ForgetPasswordReq
+		err := json.NewDecoder(c.Request.Body).Decode(&req)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, response.Err{Success: false, Message: err.Error()})
+			return
+		}
+		defer c.Request.Body.Close()
+
+		// validate request
+		validator_new := validator.New()
+		verr := validator_new.Struct(req)
+		if verr != nil {
+			validationErrors := verr.(validator.ValidationErrors)
+			arrOferr := response.ValidationErr(validationErrors)
+			errs := strings.Join(arrOferr, ", ")
+
+			c.JSON(http.StatusUnprocessableEntity, response.Err{Success: false, Message: errs})
+			return
+		}
+
+		var mesg string
+		if req.ActionFrom == 1 {
+			// check is there any user account exists
+			ok, usrDetails := pdb.IsUserExists(req.UserId, req.UserId)
+			if !ok {
+				c.JSON(http.StatusConflict, response.Err{Success: false, Message: "Account not found"})
+				return
+			}
+
+			// send mail
+			var resetLink string = "<a href=\"http://localhost:3000/reset-password/email=\" >http://localhost:3000/reset-password</a>"
+			var subject string = "Password Reset Request for Your Heygram Account"
+			var body string = fmt.Sprintf(`Hello %s,
+
+			We received a request to reset the password for your Heygram account.
+
+			To reset your password, please click the link below:
+			%s
+
+			If you did not request a password reset, please ignore this email or contact our support team.
+
+			Thank you,
+			Heygram Team
+			`, usrDetails.Username, resetLink)
+
+			_, err := configmail.ProcessMail([]string{usrDetails.Email}, body, subject)
+			if err != nil {
+				c.JSON(http.StatusConflict, response.Err{Success: false, Message: "Failed to send message. please try after sometime. <br>" + err.Error()})
+				return
+			}
+			mesg = "We've sent a password reset link to " + usrDetails.Email + ". Please check your email and follow the instructions to reset your password."
+
+		} else if req.ActionFrom == 2 {
+			// Accept new password request and update the password field
+			if req.UserId == "" || req.NewPass == "" {
+				c.JSON(http.StatusBadRequest, response.Err{Success: false, Message: "User ID and new password required."})
+				return
+			}
+
+			// Fetch user for validation (optional, you might want to validate reset token here)
+			ok, _ := pdb.IsUserExists(req.UserId, req.UserId)
+			if !ok {
+				c.JSON(http.StatusNotFound, response.Err{Success: false, Message: "Account not found."})
+				return
+			}
+
+			// Hash new password
+			hashedPwd, err := argon2hash.HashPassword(req.NewPass, salt, arg2time, memory, threads, keyLen)
+			if err != nil {
+				c.JSON(http.StatusInternalServerError, response.Err{Success: false, Message: "Error processing password."})
+				return
+			}
+
+			// Update password in storage
+			err = pdb.UpdateUserPassword(req.UserId, hashedPwd)
+			if err != nil {
+				c.JSON(http.StatusInternalServerError, response.Err{Success: false, Message: "Failed to update password."})
+				return
+			}
+
+			mesg = "Your password has been successfully reset."
+		}
+
+		c.JSON(http.StatusAccepted, response.Ok{Success: true, Message: mesg})
 	}
 }

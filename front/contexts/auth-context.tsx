@@ -21,7 +21,7 @@ interface User {
 interface AuthContextType {
   user: User | null
   isAuthenticated: boolean
-  login: (email: string, password: string) => Promise<boolean>
+  // login: (email: string, password: string) => Promise<boolean>
   logout: () => void
   loading: boolean
   error: string | null
@@ -64,7 +64,7 @@ const SAMPLE_USERS: User[] = [
 const AuthContext = createContext<AuthContextType>({
   user: null,
   isAuthenticated: false,
-  login: async () => false,
+  // login: async () => false,
   logout: () => {},
   loading: true,
   error: null,
@@ -103,41 +103,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
   useEffect(() => {
     if (!loading && !user && !pathname?.startsWith("/(auth)")) {
       if (pathname !== "/login" && pathname !== "/register") {
-        router.push("/login")
+        // router.push("/login")
       }
     }
   }, [user, loading, pathname, router])
-
-  const login = async (email: string, password: string): Promise<boolean> => {
-    setLoading(true)
-    try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000))
-
-      // For demo purposes, just check if email contains "john"
-      if (email.includes("john")) {
-        const loggedInUser = SAMPLE_USERS[0]
-        setUser(loggedInUser)
-        localStorage.setItem("heygram_user", JSON.stringify(loggedInUser))
-        router.push("/")
-        return true
-      } else if (email.includes("jane")) {
-        const loggedInUser = SAMPLE_USERS[1]
-        setUser(loggedInUser)
-        localStorage.setItem("heygram_user", JSON.stringify(loggedInUser))
-        router.push("/")
-        return true
-      } else {
-        setError("Invalid credentials")
-        return false
-      }
-    } catch (err: any) {
-      setError(err.message || "An error occurred during login")
-      return false
-    } finally {
-      setLoading(false)
-    }
-  }
 
   const logout = (): void => {
     setUser(null)
@@ -174,7 +143,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
       value={{
         user,
         isAuthenticated: !!user,
-        login,
         logout,
         loading,
         error,

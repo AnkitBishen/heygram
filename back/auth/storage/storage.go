@@ -12,4 +12,5 @@ type Storage interface {
 	GetUser(userName string) (types.User, error)
 
 	StoreLoginSession(sessionParams types.LoginSessionReq) error
+	UpdateUserPassword(userId string, newPass string) error
 }

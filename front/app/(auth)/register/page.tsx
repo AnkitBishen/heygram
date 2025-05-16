@@ -21,7 +21,7 @@ export default function RegisterPage() {
     // Simulate registration
     const registerRes = await new Promise((resolve) => {
       	// call api
-		fetch("http://localhost:8000/auth/v1/register", {
+		fetch("http://localhost:8001/auth/v1/register", {
 			method: "POST",
 			headers: {
 				"Content-Type": "application/json",
