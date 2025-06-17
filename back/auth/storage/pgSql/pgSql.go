@@ -2,7 +2,10 @@ package pgSql
 
 import (
 	"database/sql"
+	"fmt"
 	"log/slog"
+	"strconv"
+	"strings"
 	"time"
 
 	"github.com/AnkitBishen/heygram/auth/helpers/types"
@@ -137,4 +140,24 @@ func (p *Psql) UpdateUserPassword(userId string, newPassword string) error {
 		return err
 	}
 	return nil
+}
+
+func (p *Psql) Insert(table string, columns []string, values []interface{}) (bool, error) {
+	if len(columns) == 0 || len(values) == 0 {
+		return false, fmt.Errorf("params is empty")
+	}
+
+	var dollerInt int = 1
+	var dollerValue string = ""
+	for range columns {
+		dollerValue += "$" + strconv.Itoa(dollerInt)
+	}
+	var finalCols = strings.Join(columns, ", ")
+
+	_, err := p.DB.Exec("INSERT INTO "+table+" ("+finalCols+") VALUES ("+dollerValue+")", values)
+	if err != nil {
+		return false, err
+	}
+
+	return true, nil
 }

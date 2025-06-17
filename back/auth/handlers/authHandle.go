@@ -228,7 +228,7 @@ func Logout(pdb storage.Storage) gin.HandlerFunc {
 }
 
 // ForgetPassword is a handler function for change the password
-func ForgetPassword(pdb storage.Storage) gin.HandlerFunc {
+func ForgotPassword(pdb storage.Storage) gin.HandlerFunc {
 	return func(c *gin.Context) {
 
 		// get request body

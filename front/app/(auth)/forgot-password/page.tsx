@@ -8,22 +8,27 @@ import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Instagram } from "lucide-react"
+import { postForgetResetPassword } from "@/lib/authApi"
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const [isSubmitted, setIsSubmitted] = useState(false)
+  const [error, setError] = useState("")
   const router = useRouter()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
-
-    // Simulate API call for password reset
-    setTimeout(() => {
-      setIsLoading(false)
+    setError("")
+    
+    try {
+      await postForgetResetPassword({ actionFrom: 1, email })
       setIsSubmitted(true)
-    }, 1500)
+    } catch (err: any) {
+      setError(err.message || "Failed to send reset link. Try again.")
+    }
+    setIsLoading(false)
   }
 
   return (
@@ -38,8 +43,8 @@ export default function ForgotPasswordPage() {
           <h1 className="text-3xl font-bold tracking-tight">Forgot Password</h1>
           <p className="text-gray-500 dark:text-gray-400">
             {isSubmitted
-              ? "Check your email, or phone for a link to reset your password"
-              : "Enter your email, phone, or username and we'll send you a link to reset your password"}
+              ? "Check your email for a link to reset your password"
+              : "Enter your email and we'll send you a link to reset your password"}
           </p>
         </div>
 
@@ -47,19 +52,21 @@ export default function ForgotPasswordPage() {
           <div className="space-y-6">
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
-                {/* <label htmlFor="email" className="text-sm font-medium">
-                  Email
-                </label> */}
                 <Input
                   id="email"
                   type="email"
-                  placeholder="Email, Phone, or Username"
+                  placeholder="Email"
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="rounded-xl"
                 />
               </div>
+              {error && (
+                <div className="bg-red-50 dark:bg-red-900/20 text-red-800 dark:text-red-300 p-3 rounded-lg text-sm">
+                  {error}
+                </div>
+              )}
               <Button className="w-full rounded-xl py-6" disabled={isLoading}>
                 {isLoading ? "Sending reset link..." : "Send Reset Link"}
               </Button>
@@ -98,19 +105,6 @@ export default function ForgotPasswordPage() {
                 We've sent a password reset link to <span className="font-semibold">{email}</span>. Please check your
                 email and follow the instructions to reset your password.
               </p>
-            </div>
-            <div className="text-center space-y-4">
-              <p className="text-sm text-muted-foreground">
-                Didn't receive the email? Check your spam folder or request another link.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                <Button variant="outline" className="rounded-xl" onClick={() => setIsSubmitted(false)}>
-                  Try another email
-                </Button>
-                <Button className="rounded-xl" onClick={handleSubmit}>
-                  Resend link
-                </Button>
-              </div>
             </div>
             <div className="text-center text-sm">
               <Link href="/login" className="text-primary font-medium hover:underline">

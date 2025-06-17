@@ -13,8 +13,8 @@ import (
 	authHandle "github.com/AnkitBishen/heygram/auth/handlers"
 	"github.com/AnkitBishen/heygram/auth/helpers/config"
 	"github.com/AnkitBishen/heygram/auth/helpers/cors"
+	"github.com/AnkitBishen/heygram/auth/middleware"
 	"github.com/AnkitBishen/heygram/auth/storage/pgSql"
-	"github.com/AnkitBishen/heygram/common/shared"
 	"github.com/gin-gonic/gin"
 )
 
@@ -50,13 +50,13 @@ func main() {
 	// routes
 	ar.POST("/auth/v1/register", authHandle.Register(pdb))
 	ar.POST("/auth/v1/login", authHandle.Login(pdb))
-	ar.POST("/auth/v1/forgetPassword", authHandle.ForgetPassword(pdb))
-	ar.POST("/auth/v1/logout", shared.AuthMiddleware(), authHandle.Logout(pdb))
-	ar.POST("/auth/v1/profile", shared.AuthMiddleware(), authHandle.Profile(pdb))
+	ar.POST("/auth/v1/forgotPassword", authHandle.ForgotPassword(pdb))
+	ar.POST("/auth/v1/logout", middleware.AuthMiddleware(), authHandle.Logout(pdb))
+	ar.POST("/auth/v1/profile", middleware.AuthMiddleware(), authHandle.Profile(pdb))
+
 	/*
-		Pending:-
-		1. forget password - done
-		2. reset password - done
+		TODO:-
+		2. refresh-token
 		3. email otp based authentication
 		4. login via oauth providers like google, facebook
 	*/

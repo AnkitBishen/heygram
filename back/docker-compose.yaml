@@ -13,25 +13,18 @@ services:
       POSTGRES_USER: exampleU
       POSTGRES_PASSWORD: exampleP
 
-#   auth:
-#     build:
-#       context: ./auth
-#     container_name: c_auth
-#     ports: 
-#       - 8001:8001
-#     networks:
-#       - ntw_hg01
+  auth:
+    build:
+      context: ./auth
+    container_name: c_auth
+    ports: 
+      - 8001:8001
+    networks:
+      - ntw_hg01
 
-#   common:
-#     build:
-#       context: ./common
-#     container_name: c_common
-#     networks:
-#       - ntw_hg01
-
-# networks:
-#   ntw_hg01:
-#     driver: bridge
+networks:
+  ntw_hg01:
+    driver: bridge
   
   # adminer is a web interface for PostgreSQL and other sql databases
   # adminer:
